@@ -228,8 +228,12 @@ E também o que tu fez lá, como pegou as informações e tal
 
 # Execução-Web-Service
 
+
 Depois de seguir todos os passos está na hora de executar o servidor e nos conectarmos a ele com a máquina host.  
 Primeira, vamos ligar o nosso servidor:
+
+## Servidor
+Para ativarmos o servidor, precisamos inicializar o sistema:
 
 ```
 make
@@ -239,13 +243,17 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 	--hda output/images/rootfs.ext2 --nographic \
 	--append "console=ttyS0 root=/dev/sda" 
 ```
+Ao ligar, o terminal deve conter algo como:  
+Fri Apr  1 17:27:35 2022 Server Starts - 192.168.1.10:8000
+
+## Cliente
 
 Agora abriremos o nosso navegador e acessaremos o servidor através do ip 192.168.1.10 porta 8000.
 > http://192.168.1.10:8000
 
-Você deve estar visualizando uma tela parecida com esta:
+Deve aparecer uma página semelhante a esta:
 
--- **COLOCA A TELA AQUI**
+![cliente.png]
 
 > Note que sempre que atualizar a páginas alguns campos alteram seu valor dinamicamente.
 
