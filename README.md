@@ -8,6 +8,7 @@ Tabela de conteúdos
    * [Instalação de Dependênicas e Pacotes](#Instalação-de-Dependências-e-Pacotes)
    * [Configuração de Rede](#Configuração-de-Rede)
    * [Python Web Service](#Python-Web-Service)
+   * [Execução Web Service](#Execução-Web-Service)
 <!--te-->
 
 
@@ -24,7 +25,7 @@ Tabela de conteúdos
 * Lista de processos em execução (pid e nome).
 
 # Instalação-Buildroot
-Criamos uma pasta no diretório Home com o nome 'linuxDistro', faça o download da versão 2022.02 do Buildroot, decompacte o arquivo e renomeio o diretório criar para buildroot/
+Criamos uma pasta no diretório Home com o nome 'linuxDistro', faça o download da versão 2022.02 do Buildroot, decompacte o arquivo e renomeio o diretório criar para buildroot/  
 
 ```
 mkdir linuxdistro
@@ -35,7 +36,7 @@ mv buildroot-2022.02/ buildroot/
 ```
 # Instalação-de-Dependências-e-Pacotes
 
-Nesta distribuição, usaremos um WEB Server escrito em Python3 que faz uso da biblioteca *psutil*. Adicione o pacote do interpretador e da biblioteca no buildroot:
+Nesta distribuição, usaremos um WEB Server escrito em Python3 que faz uso da biblioteca *psutil*. Adicione o pacote do interpretador e da biblioteca no buildroot:  
 
 ```
 make linux-menuconfig
@@ -46,7 +47,7 @@ make linux-menuconfig
 
 > Voce pode fazer a instalação do psutil usando o pip, mas deve adicioná-lo no buildroot também em External Python Modules.
 
-Além disso também precisaremos do driver de rede Intel Ethernet e1000:
+Além disso também precisaremos do driver de rede Intel Ethernet e1000:  
 
 * *Device Drivers  ---> Network device support  --->  Ethernet driver support  ---> <\*> Intel(R) PRO/1000 Gigabit Ethernet support*
 
@@ -58,10 +59,10 @@ make linux-menuconfig
 ``` 
 
 # Configuração-de-Rede
-Nesta etapa iremos estabelecer a conexão entre a nossa máquina host e a distro que estamos montado.
+Nesta etapa iremos estabelecer a conexão entre a nossa máquina host e a distro que estamos montado.  
 
 ## Configuração Máquina Host
-Para que seja possível montarmos um Web Server, precisamos estabelecer um canal de comunicação entre a máquina host e o servidor. Para tal, primeiramente usaremos o script **qemu-ifup** descrito a seguir que cria uma interface de comunicação por parte do cliente.
+Para que seja possível montarmos um Web Server, precisamos estabelecer um canal de comunicação entre a máquina host e o servidor. Para tal, primeiramente usaremos o script **qemu-ifup** descrito a seguir que cria uma interface de comunicação por parte do cliente.  
 
 
 ```
@@ -83,16 +84,16 @@ else
 fi
 ```
 
-Dentro do diretório do *(buildroot/)*, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.
+Dentro do diretório do *(buildroot/)*, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.  
 
-*Não se esqueça de dar permissão ao arquivo criado*
+*Não se esqueça de dar permissão ao arquivo criado*  
 
 ```
 chmod +x custom-scripts/qemu-ifup
 ```
 
 ## Emulando com QEMU
-Para fazer a emulação da máquina guest, ligaremos o nosso sistema operacional sempre executando o script *qemu-ifup* com o comando:
+Para fazer a emulação da máquina guest, ligaremos o nosso sistema operacional sempre executando o script *qemu-ifup* com o comando:  
 
 ```
 sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
@@ -104,7 +105,11 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 ```
 
 ## Configuração Máquina Guest
-Agora devemos adicionar a rota do guest dentro servidor. Faremos isso de forma automatizada, a nossa distribuição deve executar o script **S41network-config** toda vez que for inicializado. Colocaremos o script na pasta *custom-scripts*.
+Agora devemos configurar a rede do nosso sistema, definiremos para a nossa máquina o ip 192.168.1.10, adicionaremos uma rota para o ip da máquina host e também a deixaremos como o nosso Gateway padrão.  
+
+Para evitar que seja necessário fazer essa configuração toda vez que ligarmos nosso sistema, usaremos o script **S41network-config** que faz essas configurações para nós e iremos configurar para que o sistemo o execute toda vez que for inicializado.   
+
+Colocaremos o script na pasta *custom-scripts*.
 
 ```
 #!/bin/sh
@@ -139,10 +144,10 @@ esac
 exit $?
 ```
 
-> Substitua os campos < IP-DO-HOST > pelo IP real.
-> Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
+> Substitua os campos < IP-DO-HOST > pelo IP real.  
+> Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.  
 
-No mesmo diretório copie e cole o código do script *pre-build.sh* a seguir:
+No mesmo diretório copie e cole o código do script *pre-build.sh* a seguir:  
 
 ```
 #!/bin/sh
@@ -158,13 +163,13 @@ De permissão de administrador para o arquivo:
 chmod +x custom-scripts/pre-build.sh
 ```
 
-Agora iremos configurar a nossa distribuição para executar o script *pre-build.sh* toda vez que for inicializado:
+Agora iremos configurar a nossa distribuição para executar o script *pre-build.sh* toda vez que for inicializado:  
 
 ```
 make menuconfig
 ```
 
-* *System configuration ---> (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images*
+* *System configuration ---> (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images*  
 
 ```
 make
@@ -175,17 +180,17 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 	--append "console=ttyS0 root=/dev/sda" 
 ```
 
-> você pode testar a conexão fazendo um ping para o IP da máquina host.
+> você pode testar a conexão fazendo um ping para o IP da máquina host.  
 
 # Python-Web-Service
 	
-O código do web service encontra-se neste mesmo repositório no link: <https://github.com/RukNdf/sisop/blob/main/f/simple_http_server.py>.
+O código do web service encontra-se neste mesmo repositório no link:   <https://github.com/RukNdf/sisop/blob/main/f/simple_http_server.py>.
 
 Coloque este código no diretório *buildroot/output/target/usr/bin/*.
 	
 > **OBS:** Para que o kernel execute o programa, você precisa ter instalado o interpretador de Python3 e o pacote PSUtil.
 	
-Agora iremos adicionar mais um script chamado *S52Wakeup* que será sempre executado ao ligarmos a nosso sistema operacional, este script roda o programa *simple_http_server.py*:
+Adicione mais um script chamado *S52Wakeup* que será sempre executado ao ligarmos a nosso sistema operacional, este script roda o programa *simple_http_server.py*:  
 
 ```
 #!/bin/sh
@@ -207,14 +212,46 @@ esac
 exit 0	
 ```
 	
-Para isso, coloque o script acima no diretório */buildroot/output/target//etc/init.d/* e em seguida dê permissão de administrador ao arquivo adicionado:
+Para isso, coloque o script acima no diretório */buildroot/output/target//etc/init.d/* e em seguida dê permissão de administrador ao arquivo adicionado:  
 
 ```
 chmod +x /etc/init.d/S51Wakeup
 ```
 
 ## Funcionamento simple_http_server
+
+
 ----- **@lucca explica aqui o que faz o código men**
+Explica o que precisa alterar no códig
+Importante explicar que é preciso alterar o campo *HOST_NAME* com o IP configurado no script *S41network-config*
+E também o que tu fez lá, como pegou as informações e tal
+
+# Execução-Web-Service
+
+Depois de seguir todos os passos está na hora de executar o servidor e nos conectarmos a ele com a máquina host.  
+Primeira, vamos ligar o nosso servidor:
+
+```
+make
+sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
+	--netdev tap,id=eth0,script=custom-scripts/qemu-ifup \
+	--kernel output/images/bzImage \
+	--hda output/images/rootfs.ext2 --nographic \
+	--append "console=ttyS0 root=/dev/sda" 
+```
+
+Agora abriremos o nosso navegador e acessaremos o servidor através do ip 192.168.1.10 porta 8000.
+> http://192.168.1.10:8000
+
+Você deve estar visualizando uma tela parecida com esta:
+
+-- **COLOCA A TELA AQUI**
+
+> Note que sempre que atualizar a páginas alguns campos alteram seu valor dinamicamente.
+
+
+FIM.
+
 
 
 
