@@ -253,7 +253,7 @@ Agora abriremos o nosso navegador e acessaremos o servidor através do ip 192.16
 
 Deve aparecer uma página semelhante a esta:
 
-![cliente.png]
+<img src="https://github.com/RukNdf/sisop/blob/main/cliente.png" width="516"/>
 
 > Note que sempre que atualizar a páginas alguns campos alteram seu valor dinamicamente.
 
