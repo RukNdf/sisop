@@ -1,16 +1,17 @@
-# TP1 LAB-SISOP
+# TP1 LAB-SISOP - Tutorial distro -Linux Web Server
 
 Tabela de conteúdos
 =================
 <!--ts-->
    * [Sobre](#Sobre)
+   * [Instalação Buildroot](#Instalação Buildroot)
 <!--te-->
 
 
-# Funcionamento
- Distribuição Linux que possua um servidor WEB escrito em Python ou C/C++.
+# Sobre
+ Tutorial de Distribuição Linux que possua um servidor WEB escrito em Python ou C/C++.
  O servidor (kernel) hospeda uma página acessada pela máquina host contendo as seguintes informações sobre o sistema:
-
+ 
 * Data e hora do sistema;
 * Uptime (tempo de funcionamento sem reinicialização do sistema) em segundos;
 * Modelo do processador e velocidade;
@@ -18,3 +19,15 @@ Tabela de conteúdos
 * Quantidade de memória RAM total e usada (MB);
 * Versão do sistema;
 * Lista de processos em execução (pid e nome).
+
+# Instalação Buildroot
+Criamos uma pasta no diretório Home com o nome 'linuxDistro', faça o download da versão 2022.02 do Buildroot, decompacte o arquivo e renomeio o diretório criar para buildroot/
+
+# Markdown
+'''
+mkdir linuxdistro
+cd linuxdistro
+wget --no-check-certificate https://buildroot.org/downloads/buildroot-2022.02.tar.gz
+tar -zxvf buildroot-2022.02.tar.gz
+mv buildroot-2022.02/ buildroot/
+'''
