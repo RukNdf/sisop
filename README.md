@@ -5,12 +5,14 @@ Tabela de conteúdos
 <!--ts-->
    * [Sobre](#Sobre)
    * [Instalação Buildroot](#Instalação-Buildroot)
+   * [Instalação de Dependênicas e Pacotes](#Instalação-de-Dependências-e-Pacotes)
    * [Configuração de Rede](#Configuração-de-Rede)
+   * [Python Web Service](#Python-Web-Service)
 <!--te-->
 
 
 # Sobre
- Tutorial de Distribuição Linux que possua um servidor WEB escrito em Python ou C/C++.
+ Tutorial de Distribuição Linux capaz de executar um servidor WEB escrito em Python ou C/C++.
  O servidor (kernel) hospeda uma página acessada pela máquina host contendo as seguintes informações sobre o sistema:
  
 * Data e hora do sistema;
@@ -31,32 +33,35 @@ wget --no-check-certificate https://buildroot.org/downloads/buildroot-2022.02.ta
 tar -zxvf buildroot-2022.02.tar.gz
 mv buildroot-2022.02/ buildroot/
 ```
-# Instalação de Pacotes
+# Instalação-de-Dependências-e-Pacotes
+
 Nesta distribuição, usaremos um WEB Server escrito em Python3 que faz uso da biblioteca *psutil*. Adicione o pacote do interpretador e da biblioteca no buildroot:
 
 ```
 make linux-menuconfig
 ```
 
-<p>Target packet --></p>
-<p>    ~ [*] Interpreter Languages and Scripting --></p>
-<p>        - <*> Python3</p>
-<p>             - [*] External Python Modules --></p>
-<p>                  - <*> Python-PSUtil</p>
+* *Target packet -->  Interpreter Languages and Scripting -->  <\*> Python3*
+* *Target packet -->  Interpreter Languages and Scripting --> External Python Modules -->  <\*> Python-PSUtil*  
 
 > Voce pode fazer a instalação do psutil usando o pip, mas deve adicioná-lo no buildroot também em External Python Modules.
 
+Além disso também precisaremos do driver de rede Intel Ethernet e1000:
+
+* *Device Drivers  ---> Network device support  --->  Ethernet driver support  ---> <\*> Intel(R) PRO/1000 Gigabit Ethernet support*
 
 
-Depois de salvar as alterações recompile a distribuição com os comandos
+Depois de salvar as alterações recompile a distribuição com os comandos:
 ```
 make clean
 make linux-menuconfig
 ``` 
 
 # Configuração-de-Rede
+Nesta etapa iremos estabelecer a conexão entre a nossa máquina host e a distro que estamos montado.
+
 ## Configuração Máquina Host
-Para que seja possível montarmos um Web Server fazendo que o servidor seja a distribuição do Linux gerada anteriormente, precisamos estabelecer um canal de comunicação entre a máquina host e o servidor. Para tal, primeiramente usaremos o script **qemu-ifup** descrito a seguir que cria uma interface de comunicação por parte do cliente.
+Para que seja possível montarmos um Web Server, precisamos estabelecer um canal de comunicação entre a máquina host e o servidor. Para tal, primeiramente usaremos o script **qemu-ifup** descrito a seguir que cria uma interface de comunicação por parte do cliente.
 
 
 ```
@@ -78,7 +83,7 @@ else
 fi
 ```
 
-dentro do diretório do buildroot/, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.
+Dentro do diretório do *(buildroot/)*, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.
 
 *Não se esqueça de dar permissão ao arquivo criado*
 
@@ -87,7 +92,7 @@ chmod +x custom-scripts/qemu-ifup
 ```
 
 ## Emulando com QEMU
-Para executar a emulação da máquina guest execute no a distruibuição do linux criada no diretório buildroot/ o comando:
+Para fazer a emulação da máquina guest, ligaremos o nosso sistema operacional sempre executando o script *qemu-ifup* com o comando:
 
 ```
 sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
@@ -99,8 +104,7 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 ```
 
 ## Configuração Máquina Guest
-Para que exista comunicação entre o Servidor e o Guest, devemos adicionar a rota de guest dentro servidor. Faremos isso de forma automatizada,
-fazendo com que o Kernel execute o scrip **S41network-config** toda vez que for inicializado. Colocaremos o script na pasta *custom-scripts*.
+Agora devemos adicionar a rota do guest dentro servidor. Faremos isso de forma automatizada, a nossa distribuição deve executar o script **S41network-config** toda vez que for inicializado. Colocaremos o script na pasta *custom-scripts*.
 
 ```
 #!/bin/sh
@@ -135,9 +139,10 @@ esac
 exit $?
 ```
 
-> Substitua os campos <IP-DO-HOST> pelo IP real. * Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
+> Substitua os campos < IP-DO-HOST > pelo IP real.
+> Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
 
-No mesmo diretório crie copie código do script *pre-build.sh* a seguir:
+No mesmo diretório copie e cole o código do script *pre-build.sh* a seguir:
 
 ```
 #!/bin/sh
@@ -159,8 +164,7 @@ Agora iremos configurar a nossa distribuição para executar o script *pre-build
 make menuconfig
 ```
 
-* System configuration
-* (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images
+* *System configuration ---> (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images*
 
 ```
 make
@@ -172,4 +176,45 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 ```
 
 > você pode testar a conexão fazendo um ping para o IP da máquina host.
+
+# Python-Web-Service
+	
+O código do web service encontra-se neste mesmo repositório no link: <https://github.com/RukNdf/sisop/blob/main/f/simple_http_server.py>.
+
+Coloque este código no diretório *buildroot/output/target/usr/bin/*.
+	
+> **OBS:** Para que o kernel execute o programa, você precisa ter instalado o interpretador de Python3 e o pacote PSUtil.
+	
+Agora iremos adicionar mais um script chamado *S52Wakeup* que será sempre executado ao ligarmos a nosso sistema operacional, este script roda o programa *simple_http_server.py*:
+
+```
+#!/bin/sh
+
+#echo"TESTE"
+#python /usr/bin/simple_http_server.py
+case "$1" in
+	start)
+		python3 /usr/bin/simple_http_server.py
+		;;
+	stop)
+		exit 1
+		;;
+	*)
+		exit 1
+		;;
+esac
+
+exit 0	
+```
+	
+Para isso, coloque o script acima no diretório */buildroot/output/target//etc/init.d/* e em seguida dê permissão de administrador ao arquivo adicionado:
+
+```
+chmod +x /etc/init.d/S51Wakeup
+```
+
+## Funcionamento simple_http_server
+----- **@lucca explica aqui o que faz o código men**
+
+
 
