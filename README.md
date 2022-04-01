@@ -36,7 +36,8 @@ mv buildroot-2022.02/ buildroot/
 ## Configuração Máquina Host
 Para que seja possível montarmos um Web Server fazendo que o servidor seja a distribuição do Linux gerada anteriormente, precisamos estabelecer um canal de comunicação entre a máquina host e o servidor. Para tal, primeiramente usaremos o script **qemu-ifup** descrito a seguir que cria uma interface de comunicação por parte do cliente.
 
-'''
+
+```
 #!/bin/sh
 set -x
 
@@ -53,22 +54,27 @@ else
         echo "Error: no interface specified"
         exit 1
 fi
-'''
+
+```
 
 dentro do diretório do buildroot/, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.
 
 *Não se esqueça de dar permissão ao arquivo criado*
-'''
+
+```
 chmod +x custom-scripts/qemu-ifup
-'''
+
+```
 
 ## Emulando com QEMU
 Para executar a emulação da máquina guest execute no a distruibuição do linux criada no diretório buildroot/ o comando:
-'''
+
+```
 sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 	--netdev tap,id=eth0,script=custom-scripts/qemu-ifup \
 	--kernel output/images/bzImage \
 	--hda output/images/rootfs.ext2 \
 	--nographic \
 	--append "console=ttyS0 root=/dev/sda"
-'''
+
+```
