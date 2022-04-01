@@ -54,7 +54,6 @@ else
         echo "Error: no interface specified"
         exit 1
 fi
-
 ```
 
 dentro do diretório do buildroot/, criaremos uma pasta chamada *custom-scripts*, para colocar todos os scripts usados neste tutorial e jogaremos o arquivo *qemu-ifup* lá dentro.
@@ -63,7 +62,6 @@ dentro do diretório do buildroot/, criaremos uma pasta chamada *custom-scripts*
 
 ```
 chmod +x custom-scripts/qemu-ifup
-
 ```
 
 ## Emulando com QEMU
@@ -76,5 +74,78 @@ sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 	--hda output/images/rootfs.ext2 \
 	--nographic \
 	--append "console=ttyS0 root=/dev/sda"
+```
+
+## Configuração Máquina Guest
+Para que exista comunicação entre o Servidor e o Guest, devemos adicionar a rota de guest dentro servidor. Faremos isso de forma automatizada,
+fazendo com que o Kernel execute o scrip **S41network-config** toda vez que for inicializado. Colocaremos o script na pasta *custom-scripts*.
 
 ```
+#!/bin/sh
+#
+# Configuring host communication.
+#
+
+case "$1" in
+  start)
+	printf "Configuring host communication."
+	
+	/sbin/ifconfig eth0 192.168.1.10 up
+	/sbin/route add -host <IP-DO-HOST> dev eth0
+	/sbin/route add default gw <IP-DO-HOST>
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+	;;
+  stop)
+	printf "Shutdown host communication. "
+	/sbin/route del default
+	/sbin/ifdown -a
+	[ $? = 0 ] && echo "OK" || echo "FAIL"
+	;;
+  restart|reload)
+	"$0" stop
+	"$0" start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+exit $?
+```
+
+** Substitua os campos <IP-DO-HOST> pelo IP real.
+** Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
+
+No mesmo diretório crie copie código do script *pre-build.sh* a seguir:
+
+```
+#!/bin/sh
+
+cp $BASE_DIR/../custom-scripts/S41network-config $BASE_DIR/target/etc/init.d
+chmod +x $BASE_DIR/target/etc/init.d/S41network-config
+chmod +x custom-scripts/pre-build.sh
+
+De permissão de administrador para o arquivo:
+
+```
+chmod +x custom-scripts/pre-build.sh
+```
+
+Agora iremos configurar a nossa distribuição para executar o script *pre-build.sh* toda vez que for inicializado:
+
+```
+make menuconfig
+```
+
+* System configuration
+** (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images
+
+'''
+make
+sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
+	--netdev tap,id=eth0,script=custom-scripts/qemu-ifup \
+	--kernel output/images/bzImage \
+	--hda output/images/rootfs.ext2 --nographic \
+	--append "console=ttyS0 root=/dev/sda" 
+'''
+
