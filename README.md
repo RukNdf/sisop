@@ -38,11 +38,11 @@ Nesta distribuição, usaremos um WEB Server escrito em Python3 que faz uso da b
 make linux-menuconfig
 ```
 
-Target packet -->
-    [*] Interpreter Languages and Scripting -->
-        <*> Python3
-        [*] External Python Modules -->
-           <*> Python-PSUtil
+<p>Target packet --></p>
+<p>\t [*] Interpreter Languages and Scripting --></p>
+<p> \t\t       <*> Python3</p>
+<p> \t\t\t       [*] External Python Modules --></p>
+<p> \t\t\t\t          <*> Python-PSUtil</p>
 
 > Voce pode fazer a instalação do psutil usando o pip, mas deve adicioná-lo no buildroot também em External Python Modules.
 
