@@ -1,10 +1,10 @@
-# TP1 LAB-SISOP - Tutorial distro -Linux Web Server
-
+# Tutorial distro -Linux Web Server
+## TP1 Laborátório de Sistemas Operacionais
 Tabela de conteúdos
 =================
 <!--ts-->
    * [Sobre](#Sobre)
-   * [Instalação Buildroot](#Instalação Buildroot)
+   * [Instalação](#Instalação)
 <!--te-->
 
 
@@ -20,14 +20,14 @@ Tabela de conteúdos
 * Versão do sistema;
 * Lista de processos em execução (pid e nome).
 
-# Instalação Buildroot
+# Instalação
 Criamos uma pasta no diretório Home com o nome 'linuxDistro', faça o download da versão 2022.02 do Buildroot, decompacte o arquivo e renomeio o diretório criar para buildroot/
 
 # Markdown
-'''
+´´´
 mkdir linuxdistro
 cd linuxdistro
 wget --no-check-certificate https://buildroot.org/downloads/buildroot-2022.02.tar.gz
 tar -zxvf buildroot-2022.02.tar.gz
 mv buildroot-2022.02/ buildroot/
-'''
+´´´
