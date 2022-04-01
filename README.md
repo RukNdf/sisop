@@ -39,7 +39,7 @@ make linux-menuconfig
 ```
 
 <p>Target packet --></p>
-<p>    - [*] Interpreter Languages and Scripting --></p>
+<p>    ~ [*] Interpreter Languages and Scripting --></p>
 <p>        - <*> Python3</p>
 <p>             - [*] External Python Modules --></p>
 <p>                  - <*> Python-PSUtil</p>
