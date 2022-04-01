@@ -113,8 +113,8 @@ esac
 exit $?
 ```
 
-** Substitua os campos <IP-DO-HOST> pelo IP real.
-** Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
+> Substitua os campos <IP-DO-HOST> pelo IP real.
+> Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
 
 No mesmo diretório crie copie código do script *pre-build.sh* a seguir:
 
@@ -124,6 +124,7 @@ No mesmo diretório crie copie código do script *pre-build.sh* a seguir:
 cp $BASE_DIR/../custom-scripts/S41network-config $BASE_DIR/target/etc/init.d
 chmod +x $BASE_DIR/target/etc/init.d/S41network-config
 chmod +x custom-scripts/pre-build.sh
+```
 
 De permissão de administrador para o arquivo:
 
