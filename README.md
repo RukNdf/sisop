@@ -31,6 +31,28 @@ wget --no-check-certificate https://buildroot.org/downloads/buildroot-2022.02.ta
 tar -zxvf buildroot-2022.02.tar.gz
 mv buildroot-2022.02/ buildroot/
 ```
+# Instalação de Pacotes
+Nesta distribuição, usaremos um WEB Server escrito em Python3 que faz uso da biblioteca *psutil*. Adicione o pacote do interpretador e da biblioteca no buildroot:
+
+```
+make linux-menuconfig
+```
+
+Target packet -->
+    [*] Interpreter Languages and Scripting -->
+        <*> Python3
+        [*] External Python Modules -->
+           <*> Python-PSUtil
+
+> Voce pode fazer a instalação do psutil usando o pip, mas deve adicioná-lo no buildroot também em External Python Modules.
+
+
+
+Depois de salvar as alterações recompile a distribuição com os comandos
+```
+make clean
+make linux-menuconfig
+``` 
 
 # Configuração-de-Rede
 ## Configuração Máquina Host
@@ -113,8 +135,7 @@ esac
 exit $?
 ```
 
-> Substitua os campos <IP-DO-HOST> pelo IP real.
-> Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
+> Substitua os campos <IP-DO-HOST> pelo IP real. * Você pode descobrir o IP da sua máquina usando o comando *ifconfig* no terminal.
 
 No mesmo diretório crie copie código do script *pre-build.sh* a seguir:
 
@@ -139,14 +160,16 @@ make menuconfig
 ```
 
 * System configuration
-** (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images
+* (custom-scripts/pre-build.sh) Custom scripts to run befor creating filesystem images
 
-'''
+```
 make
 sudo qemu-system-i386 --device e1000,netdev=eth0,mac=aa:bb:cc:dd:ee:ff \
 	--netdev tap,id=eth0,script=custom-scripts/qemu-ifup \
 	--kernel output/images/bzImage \
 	--hda output/images/rootfs.ext2 --nographic \
 	--append "console=ttyS0 root=/dev/sda" 
-'''
+```
+
+> você pode testar a conexão fazendo um ping para o IP da máquina host.
 
