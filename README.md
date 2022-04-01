@@ -24,10 +24,10 @@ Tabela de conteúdos
 Criamos uma pasta no diretório Home com o nome 'linuxDistro', faça o download da versão 2022.02 do Buildroot, decompacte o arquivo e renomeio o diretório criar para buildroot/
 
 # Markdown
-´´´
+```
 mkdir linuxdistro
 cd linuxdistro
 wget --no-check-certificate https://buildroot.org/downloads/buildroot-2022.02.tar.gz
 tar -zxvf buildroot-2022.02.tar.gz
 mv buildroot-2022.02/ buildroot/
-´´´
+```
