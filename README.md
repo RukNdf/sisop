@@ -39,10 +39,10 @@ make linux-menuconfig
 ```
 
 <p>Target packet --></p>
-<p>\t [*] Interpreter Languages and Scripting --></p>
-<p> \t\t       <*> Python3</p>
-<p> \t\t\t       [*] External Python Modules --></p>
-<p> \t\t\t\t          <*> Python-PSUtil</p>
+<p>    - [*] Interpreter Languages and Scripting --></p>
+<p>        - <*> Python3</p>
+<p>             - [*] External Python Modules --></p>
+<p>                  - <*> Python-PSUtil</p>
 
 > Voce pode fazer a instalação do psutil usando o pip, mas deve adicioná-lo no buildroot também em External Python Modules.
 
