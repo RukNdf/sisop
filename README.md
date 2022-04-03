@@ -219,12 +219,76 @@ chmod +x /etc/init.d/S51Wakeup
 ```
 
 ## Funcionamento simple_http_server
+O script python utiliza as funções da biblioteca http.server para abrir um socket no guest e receber pedidos HTTP. Ao receber um pedido o código html é gerado e retornado também pelo protocolo HTTP. 
+
+Para que o servidor possa ser acessado pela máquina host é necessário que a variável *HOST_NAME* aponte para o IP do guest (que já vem pre configurado para 192.168.1.10) e a variável *PORT_NUMBER* aponte para uma porta disponível.
+
+Para gerar o código html o programa utiliza funções internas, bibliotecas python, e arquivos do próprio linux.
 
 
------ **@lucca explica aqui o que faz o código men**
-Explica o que precisa alterar no códig
-Importante explicar que é preciso alterar o campo *HOST_NAME* com o IP configurado no script *S41network-config*
-E também o que tu fez lá, como pegou as informações e tal
+A data e hora é obtida a partir da biblioteca *time*, que retorna a informação já formatada.
+````
+import time
+s.wfile.write(bytes("<h1>"+time.ctime(time.time())+".</h1>", "utf-8"))
+````
+Informações do sistema são obtidos a partir do comando *uname* do linux e as informações da cpu são obtidas a partir do arquivo */proc/cpuinfo*.
+
+Como o arquivo *cpuinfo* contém varias outras informações sobre o sistema é necessário iterar pelas linhas procurando apenas o modelo da CPU. 
+````
+osn = os.uname()
+cpu = ""
+with open('/proc/cpuinfo', 'r') as file:
+    for line in file:
+	if "model name" in line:
+	    cpu = line.split(':')[1].strip()
+	    break
+s.wfile.write(bytes("<p><b>&nbsp&nbsp&nbsp"+osn[0]+" " + osn[2] + "</b><br> version " + osn[3] + "<br>" + cpu + "</p>", "utf-8"))	
+````
+O uptime do computador é obtido a partir do arquivo */proc/uptime*. A função *split()* é necessária para remover qualquer informação extra após o tempo de execução. 
+````
+with open('/proc/uptime', 'r') as f:
+	uptime_seconds = float(f.readline().split()[0])
+````
+A biblioteca *psutil* disponibiliza várias informações sobre os processos do sistema, incluindo toda a lista de processos e o seu uso de memória. 
+
+A função *virtual_memory()* retorna uma lista de valores, como o tamanho total da memoria em bytes e a porcentagem em uso, que são extraídos e formatados. 
+
+A função *process_iter()* nos permite iterar pela lista de processos do sistema e montar uma tabela html com os IDs e nomes de todos os processos em execução.
+````
+mem = psutil.virtual_memory()
+s.wfile.write(bytes("<p>RAM: "+str(int(mem[0]/1048576))+"MB | " + str(int(mem[3]/1048576)) + "MB used (" + str(round(mem[2],2)) + "%) </p>", "utf-8"))	
+
+s.wfile.write(bytes("<table border = \"1\">", "utf-8"))
+s.wfile.write(bytes("<tr><th><b>PID</b></th>", "utf-8"))
+s.wfile.write(bytes("<th><b>NAME</b></th></tr>", "utf-8"))
+for p in psutil.process_iter(attrs=["pid", "name"]):
+    s.wfile.write(bytes("<tr>", "utf-8"))
+    s.wfile.write(bytes("<td align=right>" + str(p.pid) + "&nbsp</td>", "utf-8"))
+    s.wfile.write(bytes("<td>&nbsp" + p.name() + "</td>", "utf-8"))
+    s.wfile.write(bytes("</tr>", "utf-8"))
+s.wfile.write(bytes("</table>", "utf-8"))
+````
+As valores de uso da CPU são obtidos a partir do programa *cpustat*. 
+
+A função *getcpuload()* retorna um dicionário com os nomes das cpus (sendo o primeiro valor o total e os subsequentes os cores individuais) e seu respectivo uso. Os nomes das cpus e os valores de uso são salvos separadamente para que possam gerar uma tabela horizontal, com os nomes acima do respectivo valor. 
+````
+k = []
+v = []
+dic = cpul.getcpuload()
+for key in dic:
+    k += [key]
+    v += [dic[key]]
+k[0] = "<b>"+k[0]+"</b>"
+s.wfile.write(bytes("<table border = \"1\">", "utf-8"))
+s.wfile.write(bytes("<tr>", "utf-8"))
+for key in k:
+    s.wfile.write(bytes("<td align=center>" + key + "</td>", "utf-8"))
+s.wfile.write(bytes("</tr>", "utf-8"))
+s.wfile.write(bytes("<tr>", "utf-8"))
+for value in v:
+    s.wfile.write(bytes("<td align=center>" + str(round(value,2)) + "%</td>", "utf-8"))
+s.wfile.write(bytes("</tr></table>", "utf-8"))
+````
 
 # Execução-Web-Service
 
