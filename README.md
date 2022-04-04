@@ -1,5 +1,7 @@
 # Tutorial distro -Linux Web Server
 ## TP1 Laborátório de Sistemas Operacionais
+*ictor Scherer Putrich e Lucca Dornelles Cezar
+
 Tabela de conteúdos
 =================
 <!--ts-->
